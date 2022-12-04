@@ -315,12 +315,13 @@ int main(int argc, char *argv[]) {
 
         usleep(interval * 1000);
 
-        scrambling_seed = (scrambling_seed++) % 128;
-
         printf("\033[K\r");
         printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
         fflush(stdout);
+	   
         totalcount++;
+	scrambling_seed = scrambling_seed + 1;
+        scrambling_seed = (scrambling_seed) % 128;
 
         lcpa_free(metapack); 
     }
