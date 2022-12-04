@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
     uint32_t session_id;
     FILE *urandom;
 
-    printf ("%s - packet injector NEW!\n", argv[0]);
+    printf ("%s - packet injector tanuki!!\n", argv[0]);
     printf ("-----------------------------------------------------\n\n");
 
     while ((c = getopt(argc, argv, "hi:c:m:b:g:n:d:a:")) != EOF) {
