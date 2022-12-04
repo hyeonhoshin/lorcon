@@ -253,14 +253,18 @@ int main(int argc, char *argv[]) {
 
     
     printf("\n[.]\tMCS %u %s %s\n\n", MCS, BW ? "40MHz" : "20MHz", GI ? "short-gi" : "long-gi");
+    
+    uint8_t scrambling_seed = 71;
 
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
         memset(payload_1, 0, PAYLOAD_LEN);
-	for (i = 0; i < PAYLOAD_LEN; i++){
-		payload[2*i] = count & 0x00FF;
-		payload[2*i+1] = (count & 0xFF00) >> 8;
-	}
+
+        for (i = 0; i < PAYLOAD_LEN; i++){
+            payload[2*i] = count & 0x00FF;
+            payload[2*i+1] = (count & 0xFF00) >> 8;
+        }
+
         memset(encoded_payload, 0, 14);
 
         // Set MCS count
@@ -311,8 +315,10 @@ int main(int argc, char *argv[]) {
 
         usleep(interval * 1000);
 
+        scrambling_seed = (scrambling_seed++) % 128;
+
         printf("\033[K\r");
-        printf("[+] Sent %d frames, Hit CTRL + C to stop...", totalcount);
+        printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
         fflush(stdout);
         totalcount++;
 
@@ -327,4 +333,3 @@ int main(int argc, char *argv[]) {
 	
     return 0;
 }
-
