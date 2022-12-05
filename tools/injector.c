@@ -53,15 +53,17 @@ void usage(char *argv[]) {
     printf("\t-g <guard_interval>   Guard interval\n");
     printf("\t-n <count>            Number of packets at each MCS to send.(Should be 128n)\n");
     printf("\t-d <delay>            Interframe delay\n");
+    printf("\t-l <length>           PSDU length\n");
 
     printf("\nExample:\n");
-    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256\n\n", argv[0]);
+    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256 -l 2300\n\n", argv[0]);
 }
 int main(int argc, char *argv[]) {
     char *interface = NULL;
     unsigned int lcode = 0;
     unsigned int npackets = 100;
     unsigned int MCS = 0;
+    unsigned int length = 2300;
 
     int value[6];
     int c,i,tmp;
@@ -111,9 +113,6 @@ int main(int argc, char *argv[]) {
     uint32_t *encoded_max = (uint32_t *) (encoded_payload + 6);
     uint32_t *encoded_session = (uint32_t *) (encoded_payload + 10);
 
-    uint8_t payload[PAYLOAD_LEN];
-    uint8_t payload_1[PAYLOAD_LEN];
-
     // Timestamp
     struct timeval time; 
     uint64_t timestamp; 
@@ -131,7 +130,7 @@ int main(int argc, char *argv[]) {
     printf ("%s - packet injector tanuki!!\n", argv[0]);
     printf ("-----------------------------------------------------\n\n");
 
-    while ((c = getopt(argc, argv, "hi:c:m:b:g:n:d:a:")) != EOF) {
+    while ((c = getopt(argc, argv, "hi:c:m:b:g:n:d:a:l:")) != EOF) {
 	switch (c) {
 	case 'i': 
 		interface = strdup(optarg);
@@ -194,7 +193,12 @@ int main(int argc, char *argv[]) {
 		usage(argv);
 		return -1;
 		break;
-
+	case 'l':
+		if (sscanf(optarg, "%u", &length) != 1) {
+		    printf("ERROR: Unable to parse packet length\n");
+		    return -1;
+		}
+		break;
 	default:
 		usage(argv);
 		return -1;
@@ -258,10 +262,15 @@ int main(int argc, char *argv[]) {
     int rr;
     FILE *fptr;
     char filename[10];
+	
+    uint8_t *payload = (uint8_t*)malloc(length);
+    if(payload == NULL){
+        printf("[!] Malloc Error!\n");
+	exit(-1);
+    }
 
     for (count = 0; count < npackets; count++) {
-        memset(payload, 0, 2*PAYLOAD_LEN);
-        memset(payload_1, 0, PAYLOAD_LEN);
+        memset(payload, 0, length);
 	
 	sprintf(filename,"ctc/genpkt_%03d.txt", scrambling_seed);
 	    
@@ -270,7 +279,7 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
         // Payload changing.
-        for (i = 0; i < PAYLOAD_LEN; i++){
+        for (i = 0; i < length; i++){
             //payload[2*i] = count & 0x00FF;
             //payload[2*i+1] = (count & 0xFF00) >> 8;
             fscanf(fptr,"%d\n", &rr);
@@ -296,15 +305,6 @@ int main(int argc, char *argv[]) {
         *encoded_max = htonl(npackets);
         *encoded_session = htonl(session_id);
 
-	
-        snprintf((char *) payload_1, PAYLOAD_LEN, "MCS %u %s%s Packet %u of %u",
-                    MCS,
-                    BW ? "40MHz" : "20MHz",
-                    GI ? " short-gi": "",
-                    count,
-                    npackets);
-
-
         metapack = lcpa_init();
 
         // Create timestamp
@@ -317,7 +317,7 @@ int main(int argc, char *argv[]) {
         //lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
         //lcpf_add_ie(metapack, 10, 14, encoded_payload);
         //lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
-        lcpa_append_copy(metapack, "IETAG", PAYLOAD_LEN, payload); // Using lcpa lib.
+        lcpa_append_copy(metapack, "IETAG", length, payload); // Using lcpa lib.
         //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
 
