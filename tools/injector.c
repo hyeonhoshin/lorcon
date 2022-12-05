@@ -271,6 +271,8 @@ int main(int argc, char *argv[]) {
             //payload[2*i+1] = (count & 0xFF00) >> 8;
             fscanf(fptr,"%d\n", &rr);
             payload[i]=(uint8_t)rr;
+
+            printf("i ");
         }
 
         memset(encoded_payload, 0, 14);
@@ -310,6 +312,10 @@ int main(int argc, char *argv[]) {
         lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
         lcpf_add_ie(metapack, 10, 14, encoded_payload);
         lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
+        lcpf_add_ie(metapack, 12, PAYLOAD_LEN, payload);
+        lcpf_add_ie(metapack, 13, PAYLOAD_LEN, payload);
+        lcpf_add_ie(metapack, 14, PAYLOAD_LEN, payload);
+        lcpf_add_ie(metapack, 15, PAYLOAD_LEN, payload);
         //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
 
