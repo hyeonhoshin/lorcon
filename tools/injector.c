@@ -272,8 +272,9 @@ int main(int argc, char *argv[]) {
             fscanf(fptr,"%d\n", &rr);
             payload[i]=(uint8_t)rr;
 
-            printf("i ");
+            printf("%d ",i);
         }
+        printf("\n");
 
         memset(encoded_payload, 0, 14);
 
@@ -312,10 +313,7 @@ int main(int argc, char *argv[]) {
         lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
         lcpf_add_ie(metapack, 10, 14, encoded_payload);
         lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
-        lcpf_add_ie(metapack, 12, PAYLOAD_LEN, payload);
-        lcpf_add_ie(metapack, 13, PAYLOAD_LEN, payload);
-        lcpf_add_ie(metapack, 14, PAYLOAD_LEN, payload);
-        lcpf_add_ie(metapack, 15, PAYLOAD_LEN, payload);
+        lcpa_append_copy(metapack, "IETAG", PAYLOAD_LEN, payload); // Using lcpa lib.
         //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
 
