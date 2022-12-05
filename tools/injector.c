@@ -264,11 +264,11 @@ int main(int argc, char *argv[]) {
     FILE *fptr;
     char filename[10];
 	
-    #uint8_t *payload = (uint8_t*)malloc(length);
-    #if(payload == NULL){
-    #    printf("[!] Malloc Error!\n");
-    #	exit(-1);
-    #}
+    //uint8_t *payload = (uint8_t*)malloc(length);
+    //if(payload == NULL){
+    //    printf("[!] Malloc Error!\n");
+    //	exit(-1);
+    //}
 	
     uint8_t payload[5000] = {'\0'};
 
