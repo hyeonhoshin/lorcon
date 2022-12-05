@@ -269,7 +269,6 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < PAYLOAD_LEN; i++){
             //payload[2*i] = count & 0x00FF;
             //payload[2*i+1] = (count & 0xFF00) >> 8;
-            
             fscanf(fptr,"%d\n", &rr);
             payload[i]=(uint8_t)rr;
         }
@@ -311,7 +310,7 @@ int main(int argc, char *argv[]) {
         lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
         lcpf_add_ie(metapack, 10, 14, encoded_payload);
         lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
-        lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
+        //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
 
         // Convert the LORCON metapack to a LORCON packet for sending
