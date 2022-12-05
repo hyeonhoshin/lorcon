@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
         memset(payload_1, 0, PAYLOAD_LEN);
-        if((fptf = fopen("Input_Bytes.txt","r"))==NULL){
+        if((fptr = fopen("Input_Bytes.txt","r"))==NULL){
                 printf("Error! opening file");
                 exit(1);
         }
