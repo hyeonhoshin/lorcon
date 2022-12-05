@@ -43,7 +43,7 @@
 #define HT_FLAG_40  (1 << 7)
 #define HT_FLAG_GI  (1 << 6)
 
-#define PAYLOAD_LEN 64
+#define PAYLOAD_LEN 1571
 
 void usage(char *argv[]) {
     printf("\t-i <interface>        Radio interface\n");
@@ -51,11 +51,11 @@ void usage(char *argv[]) {
     printf("\t-m <MCS_index>        MCS index (0~15)\n");
     printf("\t-b <band_width>       Band width(0-20M | 1-40M)\n");
     printf("\t-g <guard_interval>   Guard interval\n");
-    printf("\t-n <count>            Number of packets at each MCS to send\n");
+    printf("\t-n <count>            Number of packets at each MCS to send.(Should be 128n)\n");
     printf("\t-d <delay>            Interframe delay\n");
 
     printf("\nExample:\n");
-    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 1000\n\n", argv[0]);
+    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256\n\n", argv[0]);
 }
 int main(int argc, char *argv[]) {
     char *interface = NULL;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
     uint32_t *encoded_max = (uint32_t *) (encoded_payload + 6);
     uint32_t *encoded_session = (uint32_t *) (encoded_payload + 10);
 
-    uint8_t payload[2*PAYLOAD_LEN];
+    uint8_t payload[PAYLOAD_LEN];
     uint8_t payload_1[PAYLOAD_LEN];
 
     // Timestamp
@@ -255,14 +255,22 @@ int main(int argc, char *argv[]) {
     printf("\n[.]\tMCS %u %s %s\n\n", MCS, BW ? "40MHz" : "20MHz", GI ? "short-gi" : "long-gi");
     
     uint8_t scrambling_seed = 71;
+    int rr;
 
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
         memset(payload_1, 0, PAYLOAD_LEN);
 
+        // Convert into little endian.
         for (i = 0; i < PAYLOAD_LEN; i++){
-            payload[2*i] = count & 0x00FF;
-            payload[2*i+1] = (count & 0xFF00) >> 8;
+            //payload[2*i] = count & 0x00FF;
+            //payload[2*i+1] = (count & 0xFF00) >> 8;
+            if((fptf = fopen("Input_Bytes.txt","r"))==NULL){
+                printf("Error! opening file");
+                exit(1);
+            }
+            fscanf(fptr,"%d\n", &rr);
+            payload[i]=(uint8_t)rr;
         }
 
         memset(encoded_payload, 0, 14);
@@ -320,7 +328,7 @@ int main(int argc, char *argv[]) {
         fflush(stdout);
 	   
         totalcount++;
-	scrambling_seed = scrambling_seed + 1;
+	    scrambling_seed = scrambling_seed + 1;
         scrambling_seed = (scrambling_seed) % 128;
 
         lcpa_free(metapack); 
