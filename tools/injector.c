@@ -310,9 +310,9 @@ int main(int argc, char *argv[]) {
         lcpf_data(metapack,fcflags,duration,RA_MAC,TA_MAC,RA_MAC,TA_MAC,fragement,sequence);
 
 
-        lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
-        lcpf_add_ie(metapack, 10, 14, encoded_payload);
-        lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
+        //lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
+        //lcpf_add_ie(metapack, 10, 14, encoded_payload);
+        //lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
         lcpa_append_copy(metapack, "IETAG", 500, payload); // Using lcpa lib.
         //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
