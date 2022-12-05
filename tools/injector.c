@@ -56,14 +56,14 @@ void usage(char *argv[]) {
     printf("\t-l <length>           PSDU length\n");
 
     printf("\nExample:\n");
-    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256 -l 2300\n\n", argv[0]);
+    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256 -l 2080\n\n", argv[0]);
 }
 int main(int argc, char *argv[]) {
     char *interface = NULL;
     unsigned int lcode = 0;
     unsigned int npackets = 100;
     unsigned int MCS = 0;
-    unsigned int length = 2300;
+    unsigned int length = 2080;
 
     int value[6];
     int c,i,tmp;
@@ -254,6 +254,7 @@ int main(int argc, char *argv[]) {
     lorcon_set_ht_channel(context, channel, ch_flags);
 
     printf("[+]\t Using channel: %d flags %d\n", channel, ch_flags);
+    printf("[+]\t Packet length: %d\n",length);
 
     
     printf("\n[.]\tMCS %u %s %s\n\n", MCS, BW ? "40MHz" : "20MHz", GI ? "short-gi" : "long-gi");
@@ -263,11 +264,13 @@ int main(int argc, char *argv[]) {
     FILE *fptr;
     char filename[10];
 	
-    uint8_t *payload = (uint8_t*)malloc(length);
-    if(payload == NULL){
-        printf("[!] Malloc Error!\n");
-	exit(-1);
-    }
+    #uint8_t *payload = (uint8_t*)malloc(length);
+    #if(payload == NULL){
+    #    printf("[!] Malloc Error!\n");
+    #	exit(-1);
+    #}
+	
+    uint8_t payload[5000] = {'\0'};
 
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, length);
