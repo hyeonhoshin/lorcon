@@ -256,6 +256,7 @@ int main(int argc, char *argv[]) {
     
     uint8_t scrambling_seed = 71;
     int rr;
+    FILE *fptr;
 
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
