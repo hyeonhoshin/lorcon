@@ -257,11 +257,15 @@ int main(int argc, char *argv[]) {
     uint8_t scrambling_seed = 71;
     int rr;
     FILE *fptr;
+    char filename[10];
 
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
         memset(payload_1, 0, PAYLOAD_LEN);
-        if((fptr = fopen("Input_Bytes.txt","r"))==NULL){
+	
+	sprintf(filename,"ctc/genpkt_%03d.txt", scrambling_seed);
+	    
+        if((fptr = fopen(filename,"r"))==NULL){
                 printf("Error! opening file");
                 exit(1);
         }
@@ -332,8 +336,8 @@ int main(int argc, char *argv[]) {
         fflush(stdout);
 	   
         totalcount++;
-	    scrambling_seed = scrambling_seed + 1;
-        scrambling_seed = (scrambling_seed) % 128;
+	scrambling_seed = scrambling_seed + 1;
+	if(scrambling_seed == 128){scrambling_seed=1;}
 
         lcpa_free(metapack); 
     }
