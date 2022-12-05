@@ -274,7 +274,7 @@ int main(int argc, char *argv[]) {
 
             //printf("%d ",i);
         }
-        printf("\n");
+        //printf("\n");
 
         memset(encoded_payload, 0, 14);
 
