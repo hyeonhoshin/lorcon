@@ -260,15 +260,15 @@ int main(int argc, char *argv[]) {
     for (count = 0; count < npackets; count++) {
         memset(payload, 0, 2*PAYLOAD_LEN);
         memset(payload_1, 0, PAYLOAD_LEN);
-
-        // Convert into little endian.
+        if((fptf = fopen("Input_Bytes.txt","r"))==NULL){
+                printf("Error! opening file");
+                exit(1);
+        }
+        // Payload changing.
         for (i = 0; i < PAYLOAD_LEN; i++){
             //payload[2*i] = count & 0x00FF;
             //payload[2*i+1] = (count & 0xFF00) >> 8;
-            if((fptf = fopen("Input_Bytes.txt","r"))==NULL){
-                printf("Error! opening file");
-                exit(1);
-            }
+            
             fscanf(fptr,"%d\n", &rr);
             payload[i]=(uint8_t)rr;
         }
@@ -309,7 +309,7 @@ int main(int argc, char *argv[]) {
 
         lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
         lcpf_add_ie(metapack, 10, 14, encoded_payload);
-        lcpf_add_ie(metapack, 11, 2*PAYLOAD_LEN, payload);
+        lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
         lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
 
 
