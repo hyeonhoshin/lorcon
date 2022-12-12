@@ -37,7 +37,7 @@ void usage(char *argv[]) {
 }
 int main(int argc, char *argv[]) {
 
-	printf("============= Tanuki Injector v0.0 ==============\n")
+	printf("============= Tanuki Injector v0.0 ==============\n");
 
 	char *interface = NULL, *ssid = NULL;
 	int c;
