@@ -134,7 +134,9 @@ int main(int argc, char *argv[]) {
 
 	    for (file_seq=0;file_seq<127;file_seq++){
 
-			sprintf(fname_full, "./gen_frag_packet/gen_pkt_{%d}.txt",file_seq); // The number indicates scrambling seed.
+			sprintf(fname_full, "~/gen_frag_packet/gen_pkt_%d.txt",file_seq); // The number indicates scrambling seed.
+		    	printf("Reading : {%s},fname_full",fname_full);
+		    	fflush(stdout);
 
 /////////      read file Input_Bytes.txt
 			if ((fptr = fopen(fname_full,"r")) == NULL){
