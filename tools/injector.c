@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
             seq_num = (seq_num+1)%127;
 
             memset(payload, 0, length);
-            sprintf(filename,"~/genpkt_%03d.txt", seq_num);
+            sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
 	    printf("Debug. file(%s) will be written.\n",filename);
             
             if((fptr = fopen(filename,"r"))==NULL){
