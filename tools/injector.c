@@ -31,9 +31,10 @@ void usage(char *argv[]) {
     printf("\t-n <count>            Number of packet transmission \n");
     printf("\t-d <delay>            Interframe delay\n");
     printf("\t-l <length>           PSDU length\n");
+    printf("\t-s <scrambling_seed>  Fix scrambling seed(999=Repeat)\n");
 
     printf("\nExample:\n");
-    printf("\t%s -i wlan0 -c 11HT40- -m 0 -b 0 -g 0 -n 5 -l 2048\n\n", argv[0]);
+    printf("\t%s -i wlan0 -c 11HT40- -m 0 -b 0 -g 0 -n 5 -l 2048 -s 999\n\n", argv[0]);
 }
 int main(int argc, char *argv[]) {
 
@@ -42,6 +43,7 @@ int main(int argc, char *argv[]) {
     unsigned int npackets = 5;
     unsigned int MCS = 0;
     unsigned int length = 2080;
+    unsigned int scrambling_seed = 999;
 
     int value[6];
     int c,i,tmp;
@@ -177,6 +179,12 @@ int main(int argc, char *argv[]) {
 		    return -1;
 		}
 		break;
+    case 's':
+		if (sscanf(optarg, "%u", &scrambling_seed) != 1) {
+		    printf("ERROR: Unable to parse packet length\n");
+		    return -1;
+		}
+		break;
 	default:
 		usage(argv);
 		return -1;
@@ -233,7 +241,6 @@ int main(int argc, char *argv[]) {
 
     printf("[+]\t Using channel: %d flags %d\n", channel, ch_flags);
     printf("[+]\t Packet length: %d\n",length);
-
     
     printf("\n[.]\tMCS %u %s %s\n\n", MCS, BW ? "40MHz" : "20MHz", GI ? "short-gi" : "long-gi");
     
@@ -256,8 +263,14 @@ int main(int argc, char *argv[]) {
             seq_num = (seq_num+1)%127;
 
             memset(payload, 0, length);
-            sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
-	   		//printf\("Debug. file(%s) will be written.\n",filename);
+
+            if(scrambling_seed != 128){
+                sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
+            }
+            else
+            {
+                sprintf(filename,"/root/genpkt_%03d.txt", scrambling_seed-1); // Fixing mode.
+            }
             
             if((fptr = fopen(filename,"r"))==NULL){
                     printf("Error! opening file\n");
@@ -324,7 +337,11 @@ int main(int argc, char *argv[]) {
             usleep(interval * 1000);
 
             printf("\033[K\r");
-            printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, seq_num);
+            if(scrambling_seed != 999){
+                printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, seq_num+1);
+            }eles{
+                printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
+            }
             fflush(stdout);
         
             totalcount++;
