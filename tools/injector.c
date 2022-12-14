@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
             }
             // Payload changing.
             for (uint16_t j = 0; j < length; j++){
-				printf("Payload reading j = %d\n",j);
+		//printf("Payload reading j = %d\n",j);
                 //payload[2*i] = count & 0x00FF;
                 //payload[2*i+1] = (count & 0xFF00) >> 8;
                 fscanf(fptr,"%d\n", &rr);
@@ -317,8 +317,9 @@ int main(int argc, char *argv[]) {
             
             if (lorcon_inject(context,txpack) < 0 ){
             	printf("[!] Inject failed!\n");
-				return -1;
-			}
+		printf("[!] Before the emitting, did you type\n\nifconfig wlan0mon mtu 5000\n\n");
+		return -1;
+	    }
 
             usleep(interval * 1000);
 
