@@ -256,7 +256,8 @@ int main(int argc, char *argv[]) {
             seq_num = (seq_num+1)%127;
 
             memset(payload, 0, length);
-            sprintf(filename,"genpkt_%03d.txt", seq_num);
+            sprintf(filename,"~/genpkt_%03d.txt", seq_num);
+	    printf("Debug. file(%s) will be written.\n",filename);
             
             if((fptr = fopen(filename,"r"))==NULL){
                     printf("Error! opening file\n");
@@ -310,6 +311,8 @@ int main(int argc, char *argv[]) {
             txpack = (lorcon_packet_t *) lorcon_packet_from_lcpa(context, metapack);
 
             lorcon_packet_set_mcs(txpack, 1, MCS, GI, BW);
+		
+	    printf("Debug. Is it the injector error?\n");
             
             if (lorcon_inject(context,txpack) < 0 ) 
                 return -1;
