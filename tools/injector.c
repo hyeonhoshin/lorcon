@@ -339,7 +339,7 @@ int main(int argc, char *argv[]) {
             printf("\033[K\r");
             if(scrambling_seed != 999){
                 printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, seq_num+1);
-            }eles{
+            }else{
                 printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
             }
             fflush(stdout);
