@@ -31,7 +31,7 @@ void usage(char *argv[]) {
     printf("\t-n <count>            Number of packet transmission \n");
     printf("\t-d <delay>            Interframe delay\n");
     printf("\t-l <length>           PSDU length\n");
-    printf("\t-s <scrambling_seed>  Fix scrambling seed(999=Repeat)\n");
+    printf("\t-s <scrambling_seed>  Fix scrambling seed(999=sweep)\n");
 
     printf("\nExample:\n");
     printf("\t%s -i wlan0 -c 11HT40- -m 0 -b 0 -g 0 -n 5 -l 2048 -s 999\n\n", argv[0]);
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 
             memset(payload, 0, length);
 
-            if(scrambling_seed != 128){
+            if(scrambling_seed == 999){
                 sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
             }
             else
@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
             usleep(interval * 1000);
 
             printf("\033[K\r");
-            if(scrambling_seed != 999){
+            if(scrambling_seed == 999){
                 printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, seq_num+1);
             }else{
                 printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
