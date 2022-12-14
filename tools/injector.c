@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 
             memset(payload, 0, length);
             sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
-	    printf("Debug. file(%s) will be written.\n",filename);
+	   		printf("Debug. file(%s) will be written.\n",filename);
             
             if((fptr = fopen(filename,"r"))==NULL){
                     printf("Error! opening file\n");
@@ -265,13 +265,13 @@ int main(int argc, char *argv[]) {
                     exit(1);
             }
             // Payload changing.
-            for (i = 0; i < length; i++){
-		printf("Payload reading i = %d\n",i);
-		fflush(stdout);
+            for (uint8_t j = 0; j < length; j++){
+				printf("Payload reading j = %d\n",j);
+				fflush(stdout);
                 //payload[2*i] = count & 0x00FF;
                 //payload[2*i+1] = (count & 0xFF00) >> 8;
                 fscanf(fptr,"%d\n", &rr);
-                payload[i]=(uint8_t)rr;
+                payload[j]=(uint8_t)rr;
 
                 //printf("%d ",i);
             }
@@ -314,7 +314,7 @@ int main(int argc, char *argv[]) {
 
             lorcon_packet_set_mcs(txpack, 1, MCS, GI, BW);
 		
-	    printf("Debug. Is it the injector error?\n");
+	    	printf("Debug. Is it the injector error?\n");
             
             if (lorcon_inject(context,txpack) < 0 ) 
                 return -1;
