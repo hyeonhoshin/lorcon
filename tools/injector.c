@@ -252,7 +252,7 @@ int main(int argc, char *argv[]) {
     for (count = 0; count < npackets; count++) {
         uint8_t seq_num=INITIAL_SCRAMBLING_SEED-2; // Scrambling seed is 71 at first.
         for(uint8_t i=0; i < 127; i++){ // seq_num increases from 70, 71, 72, ..., 126, 0, ..., 70
-	    printf("Debug. Current seq_num : %d, count : %d\n",seq_num, count);
+	    	printf("Debug. Current seq_num : %d, count : %d\n",seq_num, count);
             seq_num = (seq_num+1)%127;
 
             memset(payload, 0, length);
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) {
                     exit(1);
             }
             // Payload changing.
-            for (uint8_t j = 0; j < length; j++){
+            for (uint16_t j = 0; j < length; j++){
 				//printf("Payload reading j = %d\n",j);
                 //payload[2*i] = count & 0x00FF;
                 //payload[2*i+1] = (count & 0xFF00) >> 8;
