@@ -266,6 +266,8 @@ int main(int argc, char *argv[]) {
             }
             // Payload changing.
             for (i = 0; i < length; i++){
+		printf("Payload reading i = %d\n",i);
+		fflush(stdout);
                 //payload[2*i] = count & 0x00FF;
                 //payload[2*i+1] = (count & 0xFF00) >> 8;
                 fscanf(fptr,"%d\n", &rr);
