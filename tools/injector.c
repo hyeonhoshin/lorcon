@@ -252,12 +252,12 @@ int main(int argc, char *argv[]) {
     for (count = 0; count < npackets; count++) {
         uint8_t seq_num=INITIAL_SCRAMBLING_SEED-2; // Scrambling seed is 71 at first.
         for(uint8_t i=0; i < 127; i++){ // seq_num increases from 70, 71, 72, ..., 126, 0, ..., 70
-	    	printf("Debug. Current seq_num : %d, count : %d\n",seq_num, count);
+	    	//printf\("Debug. Current seq_num : %d, count : %d\n",seq_num, count);
             seq_num = (seq_num+1)%127;
 
             memset(payload, 0, length);
             sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
-	   		printf("Debug. file(%s) will be written.\n",filename);
+	   		//printf\("Debug. file(%s) will be written.\n",filename);
             
             if((fptr = fopen(filename,"r"))==NULL){
                     printf("Error! opening file\n");
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
             }
             // Payload changing.
             for (uint16_t j = 0; j < length; j++){
-		//printf("Payload reading j = %d\n",j);
+				printf("Payload reading j = %d\n",j);
                 //payload[2*i] = count & 0x00FF;
                 //payload[2*i+1] = (count & 0xFF00) >> 8;
                 fscanf(fptr,"%d\n", &rr);
@@ -294,7 +294,7 @@ int main(int argc, char *argv[]) {
 
             metapack = lcpa_init();
 
-            // Create timestamp
+            // Create timestampprintf\("Debug
             gettimeofday(&time, NULL);
             timestamp = time.tv_sec * 1000000 + time.tv_usec;
 
@@ -313,13 +313,13 @@ int main(int argc, char *argv[]) {
 
             lorcon_packet_set_mcs(txpack, 1, MCS, GI, BW);
 		
-	    	printf("Debug. Is it the injector error?\n");
+	    	//printf\("Debug. Is it the injector error?\n");
             
             if (lorcon_inject(context,txpack) < 0 ){
             	printf("[!] Inject failed!\n");
-		printf("[!] Before the emitting, did you type\n\nifconfig wlan0mon mtu 5000\n\n");
-		return -1;
-	    }
+				printf("[!] Before the emitting, did you type\n\nifconfig wlan0mon mtu 5000\n\n");
+				return -1;
+			}
 
             usleep(interval * 1000);
 
