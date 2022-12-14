@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
     printf ("%s - packet injector tanuki!!\n", argv[0]);
     printf ("-----------------------------------------------------\n\n");
 
-    while ((c = getopt(argc, argv, "hi:c:m:b:g:n:d:a:l:")) != EOF) {
+    while ((c = getopt(argc, argv, "hi:c:m:b:g:n:d:a:l:s:")) != EOF) {
 	switch (c) {
 	case 'i': 
 		interface = strdup(optarg);
