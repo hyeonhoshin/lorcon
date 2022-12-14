@@ -1,31 +1,7 @@
 /*
-    Generates data frames at every MCS value across 20 and 40mhz
-    for testing tx and rx.
-
-    Allows tagging packets with location info for site surveys.
-
-    Packets are sent as beacons encoded at different MCS rates; 
-    beacons SHOULD bypass the triggering of CTS/RTS frame control.
-
-    Packets are sent with 2 custom IE tags:
-
-    ie 10, length 14
-        Packed byte field encoding:
-
-            Byte 0 - MCS rate and flags, where
-                Bit 7 indicates HT40 mode
-                Bit 6 indicates ShortGI mode
-                Bits 0-3 indicate MCS values 0-15
-            Byte 1 - Location code (0-255)
-            Bytes 2-5
-                32 bit current packet count
-            Bytes 6-9
-                32 bit maximum packet count
-            Bytes 10-13
-                32 bit random session id
-
-    ie 11, length 64
-        Text field containing a text description of the packed field
+    tanuki injector.
+    
+    Coded at 2022-12-14.
 */
 
 #include <stdio.h>
@@ -43,7 +19,8 @@
 #define HT_FLAG_40  (1 << 7)
 #define HT_FLAG_GI  (1 << 6)
 
-#define PAYLOAD_LEN 1571
+#define PAYLOAD_LEN 2048
+#define INITIAL_SCRAMBLING_SEED 71
 
 void usage(char *argv[]) {
     printf("\t-i <interface>        Radio interface\n");
@@ -51,17 +28,18 @@ void usage(char *argv[]) {
     printf("\t-m <MCS_index>        MCS index (0~15)\n");
     printf("\t-b <band_width>       Band width(0-20M | 1-40M)\n");
     printf("\t-g <guard_interval>   Guard interval\n");
-    printf("\t-n <count>            Number of packets at each MCS to send.(Should be 128n)\n");
+    printf("\t-n <count>            Number of packet transmission \n");
     printf("\t-d <delay>            Interframe delay\n");
     printf("\t-l <length>           PSDU length\n");
 
     printf("\nExample:\n");
-    printf("\t%s -i wlan0 -c 6HT40+ -m 0 -b 0 -g 0 -n 256 -l 2080\n\n", argv[0]);
+    printf("\t%s -i wlan0 -c 11HT40- -m 0 -b 0 -g 0 -n 5 -l 2048\n\n", argv[0]);
 }
 int main(int argc, char *argv[]) {
+
     char *interface = NULL;
     unsigned int lcode = 0;
-    unsigned int npackets = 100;
+    unsigned int npackets = 5;
     unsigned int MCS = 0;
     unsigned int length = 2080;
 
@@ -259,7 +237,6 @@ int main(int argc, char *argv[]) {
     
     printf("\n[.]\tMCS %u %s %s\n\n", MCS, BW ? "40MHz" : "20MHz", GI ? "short-gi" : "long-gi");
     
-    uint8_t scrambling_seed = 71;
     int rr;
     FILE *fptr;
     char filename[10];
@@ -273,76 +250,78 @@ int main(int argc, char *argv[]) {
     uint8_t payload[5000] = {'\0'};
 
     for (count = 0; count < npackets; count++) {
-        memset(payload, 0, length);
-	
-	sprintf(filename,"ctc/genpkt_%03d.txt", scrambling_seed);
-	    
-        if((fptr = fopen(filename,"r"))==NULL){
-                printf("Error! opening file");
-                exit(1);
+        uint8_t seq_num=INITIAL_SCRAMBLING_SEED-2; // Scrambling seed is 71 at first.
+        for(uint8_t i=0; i < 127; i++){ // seq_num increases from 70, 71, 72, ..., 126, 0, ..., 70
+            seq_num = (seq_num+1)%127;
+
+            memset(payload, 0, length);
+            sprintf(filename,"genpkt_%03d.txt", seq_num);
+            
+            if((fptr = fopen(filename,"r"))==NULL){
+                    printf("Error! opening file\n");
+                    printf("Please check the file is located in ~ and named as genpkt_000.txt");
+                    exit(1);
+            }
+            // Payload changing.
+            for (i = 0; i < length; i++){
+                //payload[2*i] = count & 0x00FF;
+                //payload[2*i+1] = (count & 0xFF00) >> 8;
+                fscanf(fptr,"%d\n", &rr);
+                payload[i]=(uint8_t)rr;
+
+                //printf("%d ",i);
+            }
+            //printf("\n");
+
+            memset(encoded_payload, 0, 14);
+
+            // Set MCS count
+            encoded_payload[0] = MCS;
+            if (GI)
+                encoded_payload[0] |= HT_FLAG_GI;
+            if (BW)
+                encoded_payload[0] |= HT_FLAG_40;
+
+            // set the location code
+            encoded_payload[1] = lcode & 0xFF;
+
+            *encoded_counter = htonl(count);
+            *encoded_max = htonl(npackets);
+            *encoded_session = htonl(session_id);
+
+            metapack = lcpa_init();
+
+            // Create timestamp
+            gettimeofday(&time, NULL);
+            timestamp = time.tv_sec * 1000000 + time.tv_usec;
+
+            lcpf_data(metapack,fcflags,duration,RA_MAC,TA_MAC,RA_MAC,TA_MAC,fragement,sequence);
+
+
+            //lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
+            //lcpf_add_ie(metapack, 10, 14, encoded_payload);
+            //lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
+            lcpa_append_copy(metapack, "IETAG", length, payload); // Using lcpa lib.
+            //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
+
+
+            // Convert the LORCON metapack to a LORCON packet for sending
+            txpack = (lorcon_packet_t *) lorcon_packet_from_lcpa(context, metapack);
+
+            lorcon_packet_set_mcs(txpack, 1, MCS, GI, BW);
+            
+            if (lorcon_inject(context,txpack) < 0 ) 
+                return -1;
+
+            usleep(interval * 1000);
+
+            printf("\033[K\r");
+            printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, seq_num);
+            fflush(stdout);
+        
+            totalcount++;
+            lcpa_free(metapack); 
         }
-        // Payload changing.
-        for (i = 0; i < length; i++){
-            //payload[2*i] = count & 0x00FF;
-            //payload[2*i+1] = (count & 0xFF00) >> 8;
-            fscanf(fptr,"%d\n", &rr);
-            payload[i]=(uint8_t)rr;
-
-            //printf("%d ",i);
-        }
-        //printf("\n");
-
-        memset(encoded_payload, 0, 14);
-
-        // Set MCS count
-        encoded_payload[0] = MCS;
-        if (GI)
-            encoded_payload[0] |= HT_FLAG_GI;
-        if (BW)
-            encoded_payload[0] |= HT_FLAG_40;
-
-        // set the location code
-        encoded_payload[1] = lcode & 0xFF;
-
-        *encoded_counter = htonl(count);
-        *encoded_max = htonl(npackets);
-        *encoded_session = htonl(session_id);
-
-        metapack = lcpa_init();
-
-        // Create timestamp
-        gettimeofday(&time, NULL);
-        timestamp = time.tv_sec * 1000000 + time.tv_usec;
-
-        lcpf_data(metapack,fcflags,duration,RA_MAC,TA_MAC,RA_MAC,TA_MAC,fragement,sequence);
-
-
-        //lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
-        //lcpf_add_ie(metapack, 10, 14, encoded_payload);
-        //lcpf_add_ie(metapack, 11, PAYLOAD_LEN, payload);
-        lcpa_append_copy(metapack, "IETAG", length, payload); // Using lcpa lib.
-        //lcpf_add_ie(metapack, 12, strlen((char *) payload_1), payload_1);
-
-
-        // Convert the LORCON metapack to a LORCON packet for sending
-        txpack = (lorcon_packet_t *) lorcon_packet_from_lcpa(context, metapack);
-
-        lorcon_packet_set_mcs(txpack, 1, MCS, GI, BW);
-		
-        if (lorcon_inject(context,txpack) < 0 ) 
-            return -1;
-
-        usleep(interval * 1000);
-
-        printf("\033[K\r");
-        printf("[+] Sent %d frames, Scrambling seed : %d, Hit CTRL + C to stop...", totalcount, scrambling_seed);
-        fflush(stdout);
-	   
-        totalcount++;
-	scrambling_seed = scrambling_seed + 1;
-	if(scrambling_seed == 128){scrambling_seed=1;}
-
-        lcpa_free(metapack); 
     }
 
     printf("\n");
