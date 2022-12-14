@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
     
     int rr;
     FILE *fptr;
-    char filename[10];
+    char filename[100];
 	
     //uint8_t *payload = (uint8_t*)malloc(length);
     //if(payload == NULL){
