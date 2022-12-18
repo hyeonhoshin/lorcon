@@ -68,19 +68,19 @@ int main(int argc, char *argv[]) {
 
     unsigned int totalcount = 1;
 
-    uint8_t *dmac = "\x04\xF0\x21\x32\xBD\xA5";
+    uint8_t *dmac = "\xFF\xFF\xFF\xFF\xFF\xFF";
 
-    uint8_t *bmac = "\x00\xDE\xAD\xBE\xEF\x00";
+    uint8_t *bmac = "\x00\x12\x34\x56\x78\x9B";
 
-//    uint8_t *RA_MAC = "\x04\xF0\x21\x32\xBD\xA5";
+    //uint8_t *RA_MAC = "\x00\x12\x34\x56\x78\x9B";
     uint8_t RA_MAC[6];
-    RA_MAC[0] = 0x04;
-    RA_MAC[1] =0xF0;
-    RA_MAC[2] =0x21;
-    RA_MAC[3] =0x32;
-    RA_MAC[4] =0xBD;
-    RA_MAC[5] =0xA5;
-    uint8_t *TA_MAC;
+    RA_MAC[0] =0x00;
+    RA_MAC[1] =0x12;
+    RA_MAC[2] =0x34;
+    RA_MAC[3] =0x56;
+    RA_MAC[4] =0x78;
+    RA_MAC[5] =0x9B;
+    uint8_t *TA_MAC = dmac;
     uint8_t *DA_MAC = RA_MAC;
     uint8_t *BSSID_MAC = bmac;
 
