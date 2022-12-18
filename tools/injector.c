@@ -80,13 +80,14 @@ int main(int argc, char *argv[]) {
     RA_MAC[3] =0x56;
     RA_MAC[4] =0x78;
     RA_MAC[5] =0x9B;
-    uint8_t *TA_MAC = dmac;
+    //uint8_t TA_MAC[6];
+    uint8_t *TA_MAC;
     uint8_t *DA_MAC = RA_MAC;
     uint8_t *BSSID_MAC = bmac;
 
-    uint8_t fcflags = 3;
-    uint8_t fragement = 3;
-    uint8_t sequence = 2;
+    uint8_t fcflags = 2; // Frame Control value in Commview.
+    uint8_t fragement = 0;
+    uint8_t sequence = 0;
     unsigned int duration = 0;
     uint8_t encoded_payload[14];
     uint32_t *encoded_counter = (uint32_t *) (encoded_payload + 2);
@@ -311,7 +312,7 @@ int main(int argc, char *argv[]) {
             gettimeofday(&time, NULL);
             timestamp = time.tv_sec * 1000000 + time.tv_usec;
 
-            lcpf_data(metapack,fcflags,duration,RA_MAC,TA_MAC,RA_MAC,TA_MAC,fragement,sequence);
+            lcpf_data(metapack,fcflags,duration,dmac,bmac,bmac,NULL,fragement,sequence);
 
 
             //lcpf_add_ie(metapack, 0, strlen("Packet_Injection"), "Packet_Injection");
