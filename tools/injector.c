@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
             memset(payload, 0, length);
 
             if(scrambling_seed == 999){
-                sprintf(filename,"/root/genpkt_%03d.txt", seq_num); // In openwrt, ~ is same with /root.
+                sprintf(filename,"/root/genpkt_%03d.txt", i); // In openwrt, ~ is same with /root.
             }
             else
             {
